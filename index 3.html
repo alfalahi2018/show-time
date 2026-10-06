@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Show Time! Performers Around the World – Grade 7 English</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --night:#1E0B2E; --plum:#2A0F3A; --gold:#FFC845; --gold-d:#C99700; --red:#B3122E; --red-d:#7D0C20;
+  --ink:#2A0F3A; --good:#1FA971; --bad:#E5484D; --ah:#0F9D8A; --ah-d:#0A7365; --cds:#D6336C; --cds-d:#9E2150;
+  --radius:16px;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  font-family:'Nunito','Trebuchet MS','Segoe UI',system-ui,sans-serif;font-weight:700;color:var(--ink);
+  background:var(--night);
+  background-image:
+    radial-gradient(ellipse 60% 40% at 50% -5%,rgba(255,200,69,.28),transparent 70%),
+    radial-gradient(circle at 10% 90%,rgba(179,18,46,.25),transparent 40%),
+    radial-gradient(circle at 92% 80%,rgba(15,157,138,.2),transparent 40%);
+  background-attachment:fixed;
+  min-height:100vh;-webkit-tap-highlight-color:transparent;
+  padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+}
+#app{max-width:980px;margin:0 auto;padding:12px 14px 70px}
+h1,h2,h3{margin:0;line-height:1.1}
+button{font:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+
+/* HUD */
+.hud{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#000;color:#fff;border:2px solid var(--gold);border-radius:var(--radius);padding:8px 14px;margin-bottom:12px}
+.hearts{font-size:22px;letter-spacing:2px;min-width:120px}
+.passport{display:flex;gap:6px;margin:0 auto}
+.stamp-slot{width:32px;height:32px;border-radius:50%;border:2px dashed rgba(255,255,255,.4);display:grid;place-items:center;font-size:17px;filter:grayscale(1) opacity(.35)}
+.stamp-slot.got{border:2px solid var(--gold);filter:none;background:rgba(255,200,69,.2);transform:rotate(-8deg)}
+.score{font-weight:800;font-size:20px}
+.mute{background:transparent;border:0;color:#fff;font-size:20px;padding:2px 6px}
+
+/* start: stage with curtains */
+.hero{position:relative;max-width:720px;margin:12px auto;border-radius:22px;border:4px solid var(--gold);background:radial-gradient(ellipse 70% 55% at 50% 0,rgba(255,233,168,.55),rgba(255,200,69,.12) 45%,transparent 70%),var(--plum);color:#fff;text-align:center;padding:26px 16% 20px;overflow:hidden;box-shadow:0 10px 0 rgba(0,0,0,.35)}
+.hero::before,.hero::after{content:"";position:absolute;top:0;bottom:0;width:13%;background:repeating-linear-gradient(90deg,var(--red-d) 0 10px,var(--red) 10px 22px,#D62A47 22px 28px)}
+.hero::before{left:0;border-right:4px solid var(--gold);border-radius:0 0 40px 0}
+.hero::after{right:0;border-left:4px solid var(--gold);border-radius:0 0 0 40px}
+.hero h1{font-family:'Lilita One','Trebuchet MS',sans-serif;font-weight:400;font-size:clamp(40px,10vw,70px);color:var(--gold);text-shadow:0 4px 0 rgba(0,0,0,.4)}
+.hero .sub{font-size:18px;margin:4px 0 12px}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 12px}
+.pcard{border-radius:16px;padding:10px 6px;color:#fff}
+.pcard.ah{background:var(--ah);box-shadow:0 5px 0 var(--ah-d)}
+.pcard.cds{background:var(--cds);box-shadow:0 5px 0 var(--cds-d)}
+.pcard .em{font-size:40px;line-height:1.1}
+.pcard b{display:block;font-size:17px}
+.pcard span{font-size:14px;font-weight:700}
+.hero input{font:inherit;font-weight:800;width:100%;max-width:300px;text-align:center;padding:10px 12px;border-radius:14px;border:3px solid var(--gold);background:#fff;color:var(--ink)}
+.rules{list-style:none;padding:0;margin:12px auto 14px;max-width:340px;text-align:left;font-size:16px}
+.rules li{padding:2px 0}
+.btn{background:var(--gold);color:var(--ink);border:0;border-radius:14px;padding:11px 26px;font-weight:800;font-size:20px;box-shadow:0 5px 0 var(--gold-d);transition:transform .08s}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 0 var(--gold-d)}
+.btn[disabled]{background:#9AA3B8;box-shadow:0 5px 0 #7A839A;cursor:not-allowed}
+.btn.ghost{background:#fff;color:var(--ink);box-shadow:0 5px 0 #C9C2D6}
+.btn.small{font-size:15px;padding:5px 14px;box-shadow:0 3px 0 var(--gold-d)}
+.credit{font-weight:800;font-size:16px;margin-top:12px}
+
+/* level header */
+.lvl-head{background:#fff;border-radius:var(--radius);padding:12px 16px;margin-bottom:12px;box-shadow:0 5px 0 rgba(0,0,0,.35);border-top:6px solid var(--red)}
+.lvl-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.lvl-head h2{font-family:'Lilita One','Trebuchet MS',sans-serif;font-weight:400;font-size:24px}
+.lvl-head p{margin:2px 0 8px;font-size:16.5px}
+.timer{display:flex;align-items:center;gap:10px}
+.track{flex:1;height:14px;background:#E6DFF0;border-radius:99px;overflow:hidden}
+.bar{height:100%;width:100%;background:var(--ah);border-radius:99px;transition:width 1s linear,background .3s}
+.timer.hurry .bar{background:var(--bad)}
+.timer.hurry #ttxt{color:var(--bad);animation:pulse .6s infinite alternate}
+#ttxt{font-weight:800;min-width:48px;text-align:right}
+@keyframes pulse{to{transform:scale(1.18)}}
+.prog{font-weight:800;font-size:18px;margin:4px 2px 8px;color:var(--ink)}
+.on-dark{color:#fff}
+
+/* chips */
+.chip{
+  display:inline-block;background:var(--gold);color:var(--ink);font-weight:800;font-size:19px;
+  padding:7px 15px;border-radius:12px;box-shadow:0 4px 0 var(--gold-d);cursor:grab;
+  touch-action:none;user-select:none;-webkit-user-select:none;text-align:center;line-height:1.2;
+}
+.chip.selected{outline:4px solid var(--red);outline-offset:2px}
+.chip.dragging{opacity:.25}
+.chip.locked{background:var(--good);color:#fff;box-shadow:0 3px 0 #13744B;cursor:default}
+.chip.ghost{position:fixed;z-index:200;pointer-events:none;transform:rotate(-4deg) scale(1.08);box-shadow:0 14px 20px rgba(0,0,0,.4)}
+.tray{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;padding:12px;background:rgba(255,255,255,.96);border-radius:var(--radius);border:3px dashed var(--gold-d);margin-top:12px;min-height:64px}
+.tray.sticky{position:sticky;bottom:6px;z-index:20;box-shadow:0 -4px 14px rgba(0,0,0,.4)}
+.tray:empty{display:none}
+
+/* level 1 vocab */
+.vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+.vcard{display:flex;gap:12px;align-items:center;background:#fff;border-radius:var(--radius);padding:10px;box-shadow:0 4px 0 rgba(0,0,0,.3)}
+.vt{flex:none;width:72px;height:72px;border-radius:14px;display:grid;place-items:center;font-size:42px;background:linear-gradient(160deg,var(--a),var(--b))}
+.vt span{filter:drop-shadow(0 3px 0 rgba(0,0,0,.2))}
+.vr{flex:1;min-width:0}
+.vdef{font-size:15.5px;line-height:1.25;margin-bottom:6px}
+.vdrop{min-height:42px;border:3px dashed var(--ah);border-radius:10px;background:#E3F7F4;display:grid;place-items:center}
+.vdrop:empty::before{content:"drop the word";font-size:14px;opacity:.55}
+.vdrop .chip{display:block;width:100%;padding:5px 8px}
+.hover{outline:4px solid var(--red);outline-offset:1px}
+.vcard.flash,.qcard.flash,.qa.flash{animation:flash .6s}
+@keyframes flash{30%{box-shadow:0 0 0 6px var(--good)}}
+
+/* bin game (levels 2 and 5) */
+.clue-area{background:#fff;border-radius:var(--radius);padding:14px;text-align:center;margin-bottom:12px;box-shadow:0 5px 0 rgba(0,0,0,.3)}
+.clue-area .big{font-size:56px;line-height:1.1}
+.chip.sent{font-size:clamp(20px,4.6vw,27px);padding:13px 20px;max-width:100%}
+.judge{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
+.jbin{border-radius:var(--radius);padding:14px 8px;text-align:center;color:#fff;transition:transform .15s;min-height:130px}
+.jt{font-family:'Lilita One','Trebuchet MS',sans-serif;font-size:clamp(22px,5vw,30px);line-height:1.1}
+.jbin small{font-size:14px;font-weight:700;display:block;margin-bottom:6px}
+.jbin.ah{background:var(--ah);box-shadow:0 6px 0 var(--ah-d)}
+.jbin.cds{background:var(--cds);box-shadow:0 6px 0 var(--cds-d)}
+.jbin.ok{background:var(--good);box-shadow:0 6px 0 #13744B}
+.jbin.no{background:var(--bad);box-shadow:0 6px 0 #A82A2E}
+.jbin.hover{transform:scale(1.04)}
+.bl{display:grid;gap:5px;margin-top:6px}
+.mini{background:rgba(255,255,255,.2);border-radius:8px;padding:3px 6px;font-size:13px;line-height:1.2;font-weight:700;text-align:left}
+
+/* level 3 gaps */
+.qgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:10px}
+.qcard{display:flex;align-items:center;gap:12px;background:#fff;border-radius:var(--radius);padding:10px;box-shadow:0 4px 0 rgba(0,0,0,.3)}
+.qs{flex:none;width:64px;height:64px;border-radius:14px;display:grid;place-items:center;font-size:38px;background:linear-gradient(160deg,var(--a),var(--b))}
+.qs span{filter:drop-shadow(0 3px 0 rgba(0,0,0,.2))}
+.qt{font-size:18px;line-height:1.9}
+.gap{display:inline-grid;place-items:center;min-width:118px;min-height:38px;vertical-align:middle;border:3px dashed var(--red);border-radius:10px;background:#FFF1D2;margin:0 2px;padding:0 3px}
+.gap .chip{font-size:inherit;padding:2px 10px}
+
+/* level 4 Q&A */
+.qa{background:#fff;border-radius:var(--radius);padding:10px 12px;margin-bottom:8px;box-shadow:0 4px 0 rgba(0,0,0,.3)}
+.qa .q{display:flex;gap:10px;align-items:center;font-size:18px}
+.qa .q .em{font-size:32px}
+.drop{min-height:46px;margin-top:6px;border:3px dashed var(--red);border-radius:12px;background:#FFF1D2;display:grid;place-items:center}
+.drop:empty::before{content:"drop the answer here";font-size:14px;opacity:.55}
+.drop .chip{display:block;width:100%;font-size:17px}
+
+.shake{animation:shake .4s}
+@keyframes shake{20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+
+/* toast / modal / confetti */
+.toast{position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:300;padding:10px 20px;border-radius:99px;font-weight:800;color:#fff;box-shadow:0 8px 18px rgba(0,0,0,.4);animation:toast 2.3s forwards;max-width:92vw;text-align:center}
+.toast.good{background:var(--good)} .toast.bad{background:var(--bad)}
+@keyframes toast{0%{opacity:0;transform:translate(-50%,-20px)}10%,82%{opacity:1;transform:translate(-50%,0)}100%{opacity:0}}
+.overlay{position:fixed;inset:0;background:rgba(10,0,20,.78);display:grid;place-items:center;z-index:400;padding:16px}
+.modal{background:#fff;border-radius:24px;padding:22px;max-width:460px;width:100%;text-align:center;box-shadow:0 12px 0 rgba(0,0,0,.3);max-height:92vh;overflow:auto}
+.modal h2{font-family:'Lilita One','Trebuchet MS',sans-serif;font-weight:400;font-size:30px;margin-bottom:8px}
+.modal p{font-size:18px;margin:6px 0 14px}
+.fact{background:#FFF1D2;border:2px dashed var(--gold-d);border-radius:12px;padding:8px 10px;font-size:16px;margin:0 0 14px}
+.info{text-align:left;font-size:16px;margin:0 0 12px}
+.info .pcard{margin-bottom:8px;padding:10px 12px}
+.info ul{margin:4px 0 0;padding-left:18px}
+.big-stamp{width:116px;height:116px;border-radius:50%;margin:0 auto 12px;border:5px double var(--red);color:var(--red);display:grid;place-items:center;font-size:54px;transform:rotate(-10deg);animation:stamp .5s cubic-bezier(.2,1.6,.4,1)}
+@keyframes stamp{from{transform:rotate(-10deg) scale(2.6);opacity:0}}
+.conf{position:fixed;top:-16px;width:10px;height:14px;z-index:350;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(108vh) rotate(720deg)}}
+
+/* certificate */
+.cert{max-width:680px;margin:14px auto;background:#fff;border-radius:24px;padding:30px 22px;text-align:center;border:8px double var(--gold);box-shadow:0 10px 0 rgba(0,0,0,.3)}
+.cert h2{font-family:'Lilita One','Trebuchet MS',sans-serif;font-weight:400;font-size:clamp(32px,7vw,48px);color:var(--red)}
+.cert .name{font-size:clamp(30px,7vw,46px);font-weight:800;color:var(--ah);margin:10px 0}
+.cert .stars{font-size:44px;margin:8px 0}
+.cert .stats{font-size:19px}
+.actions{display:flex;gap:12px;justify-content:center;margin-top:16px;flex-wrap:wrap}
+
+footer.site{position:fixed;left:0;right:0;bottom:0;text-align:center;font-weight:800;font-size:14px;padding:6px 8px calc(6px + env(safe-area-inset-bottom));background:#000;color:var(--gold);z-index:10}
+
+@media (max-width:560px){
+  .vgrid,.qgrid{grid-template-columns:1fr}
+  .vt{width:60px;height:60px;font-size:34px}
+  .qs{width:56px;height:56px;font-size:32px}
+  .qt{font-size:16.5px}
+  .gap{min-width:100px}
+  .chip{font-size:17px}
+  .tray.sticky .chip{font-size:15px;padding:6px 10px}
+  .drop .chip{font-size:15px}
+  .qa .q{font-size:16px}
+  .mini{font-size:12px}
+  .hero{padding:22px 15% 16px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media print{
+  body *{visibility:hidden}
+  .cert,.cert *{visibility:visible}
+  .cert{position:absolute;left:0;top:0;width:100%;box-shadow:none}
+  footer.site{display:none}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="hud" id="hud" hidden>
+    <div class="hearts" id="hearts" aria-label="Lives"></div>
+    <div class="passport" id="passport" aria-label="Stamps"></div>
+    <div class="score" id="score">⭐ 0</div>
+    <button class="mute" id="mute" aria-label="Sound on or off">🔊</button>
+  </div>
+  <main id="stage"></main>
+</div>
+<footer class="site">Created by T.Badria Alfalahi · Grade 7 English · Culture · Lesson 6, part 1</footer>
+
+<script>
+/* ============ DATA ============ */
+const INFO_HTML=`
+  <div class="info">
+    <div class="pcard ah"><b>⚔️ Al Haboot</b>
+      <ul><li>A traditional Omani performance</li><li>Popular in the mountains, especially in Dhofar</li>
+      <li>Performers sing a poem and move to its rhythm</li><li>They carry swords and jump in the air</li>
+      <li>You can watch it on national days or celebrations</li></ul></div>
+    <div class="pcard cds"><b>🎪 Cirque du Soleil</b>
+      <ul><li>A big circus from Canada – "circus of the sun"</li><li>Two men started it in 1984</li>
+      <li>Fantastic costumes and amazing make-up</li><li>Its own theatre in Las Vegas since 1993</li>
+      <li>Performs on every continent except Antarctica</li></ul></div>
+  </div>`;
+
+const VOCAB=[
+ {w:'performer',e:'🤹',c:['#FFE9A8','#F5B700'],d:'A person who entertains people on a stage.'},
+ {w:'performance',e:'🎭',c:['#C9B8FF','#5B47E0'],d:'The act of showing entertainment to an audience.'},
+ {w:'poem',e:'📜',c:['#FFD1F0','#FF8AD8'],d:'Words in lines that often have rhythm. Al Haboot performers sing one.'},
+ {w:'rhythm',e:'🥁',c:['#FFC2C2','#E5484D'],d:'A regular pattern of beats in music or in a poem.'},
+ {w:'swords',e:'⚔️',c:['#E0F4FF','#7CC4F2'],d:'Long metal blades. Al Haboot performers carry them.'},
+ {w:'costumes',e:'👘',c:['#B5EAA2','#3FA34D'],d:'Special clothes that performers wear on stage.'},
+ {w:'make-up',e:'💄',c:['#FFB8D2','#D6336C'],d:'Colours that performers put on their faces.'},
+ {w:'theatre',e:'🏛️',c:['#FFE0A3','#E08E1B'],d:'A building where shows are performed.'}
+];
+const SORT=[
+ {e:'🥁',s:'The performers move to the rhythm of a poem.',k:'ah'},
+ {e:'🎪',s:'It is a big circus from Canada.',k:'cds'},
+ {e:'⛰️',s:'It is popular in the mountains of Dhofar.',k:'ah'},
+ {e:'🌍',s:'They perform all around the world.',k:'cds'},
+ {e:'⚔️',s:'The performers jump in the air with swords.',k:'ah'},
+ {e:'🎰',s:'You can watch the performance in Las Vegas.',k:'cds'},
+ {e:'🇴🇲',s:'You can sometimes watch it on national days.',k:'ah'},
+ {e:'👨‍👨',s:'Two men started it in 1984.',k:'cds'},
+ {e:'👘',s:'The performers might wear traditional or formal clothes.',k:'ah'},
+ {e:'☀️',s:'Its name means "circus of the sun".',k:'cds'}
+];
+const GAPS=[
+ {e:'⛰️',c:['#B5EAA2','#3FA34D'],s:'Al Haboot is popular in the mountains, especially in ___.',a:'Dhofar'},
+ {e:'⚔️',c:['#E0F4FF','#7CC4F2'],s:'The Al Haboot performers often carry ___.',a:'swords'},
+ {e:'📜',c:['#FFD1F0','#FF8AD8'],s:'They sing a ___ to a special rhythm.',a:'poem'},
+ {e:'🇴🇲',c:['#FFC2C2','#E5484D'],s:'You can sometimes watch Al Haboot on national ___.',a:'days'},
+ {e:'🍁',c:['#FFB8D2','#D6336C'],s:'Cirque du Soleil is a big circus from ___.',a:'Canada'},
+ {e:'☀️',c:['#FFE9A8','#F5B700'],s:'The name Cirque du Soleil means "circus of the ___".',a:'sun'},
+ {e:'🎰',c:['#C9B8FF','#5B47E0'],s:'They have had their own theatre in Las Vegas since ___.',a:'1993'},
+ {e:'🧊',c:['#9BE7FF','#2E86DE'],s:'They have performed on every continent except ___.',a:'Antarctica'}
+];
+const GAP_DECOYS=['1984','Muscat'];
+const QA=[
+ {e:'🎭',q:'Why do people enjoy watching performers on stage?',a:'Watching performers on stage can be exciting.'},
+ {e:'📅',q:'When can you sometimes watch Al Haboot?',a:'You can sometimes watch Al Haboot on national days or for celebrations.'},
+ {e:'👘',q:'What might Al Haboot performers wear?',a:'They might wear traditional or formal clothes.'},
+ {e:'🧊',q:'In which continent have Cirque du Soleil not performed?',a:'Cirque du Soleil have not performed in Antarctica.'},
+ {e:'⚔️',q:'What do the Al Haboot performers often carry?',a:'They often carry swords.'},
+ {e:'🎰',q:'How long have Cirque du Soleil had their theatre in Las Vegas?',a:'They have had their theatre in Las Vegas since 1993.'}
+];
+const TF=[
+ {e:'🇴🇲',s:'Al Haboot is a traditional Omani performance.',k:'T'},
+ {e:'☂️',s:'Al Haboot performers often carry umbrellas.',k:'F',fix:'They often carry swords.'},
+ {e:'🍁',s:'Cirque du Soleil is a big circus from Canada.',k:'T'},
+ {e:'🧊',s:'Cirque du Soleil have performed in Antarctica.',k:'F',fix:'They have performed in every continent except Antarctica.'},
+ {e:'🏺',s:'Performers have used make-up since the time of the ancient Greeks.',k:'T'},
+ {e:'👩‍👩',s:'Two women started Cirque du Soleil in 1984.',k:'F',fix:'Two men started it in 1984.'},
+ {e:'🎉',s:'You can sometimes watch Al Haboot on national days.',k:'T'},
+ {e:'🏛️',s:'Cirque du Soleil have their own theatre in Muscat.',k:'F',fix:'Their own theatre is in Las Vegas, in the USA.'}
+];
+const LEVELS=[
+ {name:'Word stage',emoji:'🎤',time:120,help:'Read the meaning. Drag the right word onto it.',fact:'Performers have used make-up for about 2,500 years, since the ancient Greeks!',render:L1},
+ {name:'Who is who?',emoji:'⚖️',time:130,help:'Is it Al Haboot or Cirque du Soleil? Drag each sentence to the right box.',fact:'Al Haboot is popular in the mountains of Oman, especially in Dhofar.',render:L2},
+ {name:'Complete the facts',emoji:'✏️',time:150,help:'Drag the correct word into each gap.',fact:'Cirque du Soleil means "circus of the sun".',render:L3},
+ {name:'Questions and answers',emoji:'💬',time:150,help:'Drag the correct answer to each question.',fact:'Cirque du Soleil perform on every continent except Antarctica!',render:L4},
+ {name:'True or false?',emoji:'🏆',time:100,help:'Is the sentence true or false? Drag it to the right box.',fact:'You are ready for the big show!',render:L5}
+];
+const MAX_SCORE=8*15+10*12+8*15+6*20+8*15;
+
+/* ============ HELPERS ============ */
+const $=s=>document.querySelector(s);
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+const state={name:'',lives:5,score:0,level:0,stamps:[false,false,false,false,false],mute:false,scoreAtStart:0};
+let dropHandler=null,selected=null,dragCtx=null,tInt=null,tLeft=0,tTotal=1;
+
+/* ============ SOUND ============ */
+let ac;
+function beep(freq,dur,type='sine',vol=.15,delay=0){
+  if(state.mute) return;
+  try{
+    ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+    const o=ac.createOscillator(),g=ac.createGain(),t=ac.currentTime+delay;
+    o.type=type;o.frequency.value=freq;o.connect(g);g.connect(ac.destination);
+    g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);
+    o.start(t);o.stop(t+dur);
+  }catch(e){}
+}
+const sfx={
+  ok(){beep(660,.15);beep(880,.2,'sine',.15,.1)},
+  no(){beep(200,.3,'sawtooth',.09)},
+  win(){[523,659,784,1047].forEach((f,i)=>beep(f,.28,'triangle',.15,i*.12))},
+  tick(){beep(900,.05,'square',.03)}
+};
+
+/* ============ HUD / UI ============ */
+function renderHUD(){
+  $('#hearts').textContent='❤️'.repeat(Math.max(0,state.lives))+'🤍'.repeat(Math.max(0,5-state.lives));
+  $('#score').textContent='⭐ '+state.score;
+  $('#passport').innerHTML=LEVELS.map((l,i)=>`<div class="stamp-slot ${state.stamps[i]?'got':''}" title="${l.name}">${l.emoji}</div>`).join('');
+  $('#mute').textContent=state.mute?'🔇':'🔊';
+}
+$('#mute').onclick=()=>{state.mute=!state.mute;renderHUD()};
+function toast(msg,type){
+  const t=document.createElement('div');t.className='toast '+type;t.textContent=msg;
+  document.body.appendChild(t);setTimeout(()=>t.remove(),2300);
+}
+function confetti(){
+  if(window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+  const cols=['#FFC845','#B3122E','#0F9D8A','#D6336C','#FFFFFF','#7B4DE0'];
+  for(let i=0;i<70;i++){
+    const c=document.createElement('div');c.className='conf';
+    c.style.left=Math.random()*100+'vw';c.style.background=pick(cols);
+    c.style.animationDuration=(2+Math.random()*2)+'s';c.style.animationDelay=Math.random()*.6+'s';
+    document.body.appendChild(c);setTimeout(()=>c.remove(),4800);
+  }
+}
+function showModal(html,btnText,cb){
+  const o=document.createElement('div');o.className='overlay';
+  o.innerHTML=`<div class="modal" role="dialog" aria-modal="true">${html}<button class="btn" id="mbtn">${btnText}</button></div>`;
+  document.body.appendChild(o);
+  const b=o.querySelector('#mbtn');b.focus();
+  b.onclick=()=>{o.remove();cb&&cb()};
+}
+
+/* ============ TIMER ============ */
+function startTimer(sec){
+  stopTimer();tTotal=tLeft=sec;updTimer();
+  tInt=setInterval(()=>{
+    tLeft--;updTimer();
+    if(tLeft>0&&tLeft<=10) sfx.tick();
+    if(tLeft<=0){stopTimer();toast("Time's up! Keep going – no bonus now.",'bad')}
+  },1000);
+}
+function stopTimer(){clearInterval(tInt);tInt=null}
+function updTimer(){
+  const bar=$('.bar'),txt=$('#ttxt'),box=$('.timer');
+  if(!bar) return;
+  const left=Math.max(0,tLeft);
+  bar.style.width=(left/tTotal*100)+'%';
+  txt.textContent=Math.floor(left/60)+':'+String(left%60).padStart(2,'0');
+  box.classList.toggle('hurry',left/tTotal<=.25&&left>0);
+}
+
+/* ============ DRAG & DROP ENGINE (mouse + touch + tap) ============ */
+function clearSel(){if(selected){selected.classList.remove('selected');selected=null}}
+function clearHover(){document.querySelectorAll('.hover').forEach(e=>e.classList.remove('hover'))}
+function zoneAt(x,y){const el=document.elementFromPoint(x,y);return el&&el.closest?el.closest('.zone'):null}
+document.addEventListener('pointerdown',e=>{
+  const chip=e.target.closest&&e.target.closest('.chip:not(.locked):not(.ghost)');
+  if(!chip||!dropHandler) return;
+  e.preventDefault();
+  dragCtx={chip,sx:e.clientX,sy:e.clientY,moved:false};
+});
+document.addEventListener('pointermove',e=>{
+  const d=dragCtx;if(!d) return;
+  if(!d.moved&&Math.hypot(e.clientX-d.sx,e.clientY-d.sy)>6){
+    d.moved=true;const r=d.chip.getBoundingClientRect();
+    d.ghost=d.chip.cloneNode(true);d.ghost.classList.add('ghost');d.ghost.classList.remove('selected');
+    d.ghost.style.width=r.width+'px';document.body.appendChild(d.ghost);
+    d.ox=d.sx-r.left;d.oy=d.sy-r.top;d.chip.classList.add('dragging');clearSel();
+  }
+  if(d.moved){
+    d.ghost.style.left=(e.clientX-d.ox)+'px';d.ghost.style.top=(e.clientY-d.oy)+'px';
+    clearHover();const z=zoneAt(e.clientX,e.clientY);if(z) z.classList.add('hover');
+  }
+});
+function endDrag(e,cancel){
+  const d=dragCtx;if(!d) return;dragCtx=null;
+  if(d.moved){
+    d.ghost.remove();d.chip.classList.remove('dragging');clearHover();
+    if(!cancel){const z=zoneAt(e.clientX,e.clientY);if(z&&dropHandler) dropHandler(d.chip,z)}
+  }else if(!cancel){
+    if(selected===d.chip) clearSel();
+    else{clearSel();selected=d.chip;d.chip.classList.add('selected')}
+  }
+}
+document.addEventListener('pointerup',e=>endDrag(e,false));
+document.addEventListener('pointercancel',e=>endDrag(e,true));
+document.addEventListener('click',e=>{
+  const z=e.target.closest&&e.target.closest('.zone');
+  if(z&&selected&&!e.target.closest('.chip')&&dropHandler){const c=selected;clearSel();dropHandler(c,z)}
+});
+
+/* ============ GAME FLOW ============ */
+function loseLife(){
+  state.lives--;renderHUD();
+  if(state.lives<=0){
+    stopTimer();dropHandler=null;
+    showModal('<div class="big-stamp">💔</div><h2>Out of lives!</h2><p>Do not worry. Try this level again.</p>','Try again',()=>{
+      state.lives=3;state.score=state.scoreAtStart;renderHUD();startLevel(state.level);
+    });
+  }
+}
+function wrong(chip,zone,msg){
+  sfx.no();
+  [chip,zone].forEach(el=>{if(!el)return;el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake')});
+  toast(msg||pick(['Not quite – try again!','Oops! Think about the text.','Almost! Look again.']),'bad');
+  loseLife();
+}
+function right(points,msg){
+  state.score+=points;renderHUD();sfx.ok();
+  toast(msg||pick(['Bravo! 🎉','Perfect! ⭐','Well done! 👏','Yes! Correct! ✅']),'good');
+}
+function startGame(){
+  state.name=($('#pname')?.value||'').trim();
+  Object.assign(state,{lives:5,score:0,level:0,stamps:[false,false,false,false,false]});
+  $('#hud').hidden=false;renderHUD();startLevel(0);
+}
+function startLevel(i){
+  state.level=i;state.scoreAtStart=state.score;dropHandler=null;clearSel();
+  const L=LEVELS[i];
+  $('#stage').innerHTML=`
+    <div class="lvl-head">
+      <div class="lvl-top"><h2>${L.emoji} Level ${i+1} of ${LEVELS.length}: ${L.name}</h2><button class="btn small" id="infoBtn">📖 Info</button></div>
+      <p>${L.help} <small>(Or tap a word, then tap a box.)</small></p>
+      <div class="timer"><div class="track"><div class="bar"></div></div><span id="ttxt"></span></div>
+    </div>
+    <div id="play"></div>`;
+  $('#infoBtn').onclick=()=>showModal('<h2>Performers around the world</h2>'+INFO_HTML,'Back to the game');
+  startTimer(L.time);
+  L.render($('#play'));
+  window.scrollTo({top:0});
+}
+function levelComplete(){
+  stopTimer();dropHandler=null;clearSel();
+  const bonus=Math.max(0,tLeft);
+  state.score+=bonus;state.stamps[state.level]=true;state.lives=Math.min(5,state.lives+1);
+  renderHUD();sfx.win();confetti();
+  const L=LEVELS[state.level],last=state.level===LEVELS.length-1;
+  showModal(`<div class="big-stamp">${L.emoji}</div><h2>Level ${state.level+1} complete!</h2>
+    <p>⏱️ Time bonus: <b>+${bonus}</b></p>
+    <div class="fact">💡 <b>${last?'Final scene:':'Did you know?'}</b> ${L.fact}</div>`,
+    last?'See my certificate 🏅':'Next level ▶',
+    ()=>last?finish():startLevel(state.level+1));
+}
+function finish(){
+  const stars=state.score>=MAX_SCORE?3:state.score>=MAX_SCORE*.72?2:1;
+  $('#stage').innerHTML=`
+    <div class="cert">
+      <div style="font-size:46px">🎭⚔️🎪🏆</div>
+      <h2>Show Time Star</h2>
+      <p>This certificate is awarded to</p>
+      <div class="name"></div>
+      <p>for learning about performers and performances around the world!</p>
+      <div class="stars">${'⭐'.repeat(stars)}${'☆'.repeat(3-stars)}</div>
+      <div class="stats">Final score: <b>${state.score}</b> · Lives left: <b>${state.lives}</b></div>
+      <p class="credit">Created by T.Badria Alfalahi</p>
+    </div>
+    <div class="actions">
+      <button class="btn" id="again">Play again 🔁</button>
+      <button class="btn ghost" id="print">Print certificate 🖨️</button>
+    </div>`;
+  document.querySelector('.cert .name').textContent=state.name||'Super Student';
+  $('#again').onclick=showStart;
+  $('#print').onclick=()=>window.print();
+  confetti();
+}
+
+/* ============ LEVEL 1: vocabulary ============ */
+function L1(play){
+  let left=VOCAB.length;
+  play.innerHTML=`<div class="vgrid">${shuffle(VOCAB).map(v=>`
+      <div class="vcard"><div class="vt" style="--a:${v.c[0]};--b:${v.c[1]}"><span>${v.e}</span></div>
+      <div class="vr"><div class="vdef">${v.d}</div><div class="zone vdrop" data-w="${v.w}"></div></div></div>`).join('')}</div>
+    <div class="tray sticky">${shuffle(VOCAB).map(v=>`<div class="chip">${v.w}</div>`).join('')}</div>`;
+  dropHandler=(chip,zone)=>{
+    if(!zone.classList.contains('vdrop')||zone.firstElementChild) return;
+    if(chip.textContent===zone.dataset.w){
+      zone.appendChild(chip);chip.classList.add('locked');
+      zone.closest('.vcard').classList.add('flash');
+      right(15);left--;
+      if(left===0) setTimeout(levelComplete,700);
+    }else wrong(chip,zone,chip.textContent==='performer'||chip.textContent==='performance'?'A performer is a person. A performance is the show.':null);
+  };
+}
+
+/* ============ BIN GAME (levels 2 and 5) ============ */
+function binGame(play,items,bins,o){
+  const list=shuffle(items);let i=0;
+  play.innerHTML=`<div class="clue-area"><div class="prog" id="bprog"></div><div class="big" id="bemoji"></div><div id="bchip"></div></div>
+    <div class="judge">${bins.map(b=>`<div class="jbin ${b.cls} zone" data-key="${b.key}"><div class="jt">${b.label}</div><small>${b.sub}</small><div class="bl"></div></div>`).join('')}</div>`;
+  function show(){
+    const it=list[i];
+    $('#bprog').textContent=`${o.word} ${i+1} of ${list.length}`;
+    $('#bemoji').textContent=it.e;
+    $('#bchip').innerHTML=`<div class="chip sent" data-key="${it.k}">${esc(it.s)}</div>`;
+  }
+  const handler=(chip,zone)=>{
+    if(!zone.classList.contains('jbin')) return;
+    const it=list[i];
+    if(zone.dataset.key===chip.dataset.key){
+      dropHandler=null;chip.classList.add('locked');
+      if(o.accumulate){const m=document.createElement('div');m.className='mini';m.textContent=it.s;zone.querySelector('.bl').appendChild(m)}
+      right(o.pts,it.fix?'Right! '+it.fix:null);
+      i++;
+      if(i>=list.length) setTimeout(levelComplete,900);
+      else setTimeout(()=>{show();dropHandler=handler},it.fix?2000:700);
+    }else wrong(chip,zone,o.hint(it));
+  };
+  show();dropHandler=handler;
+}
+function L2(play){
+  binGame(play,SORT,[
+    {key:'ah',cls:'ah',label:'⚔️ Al Haboot',sub:'Oman'},
+    {key:'cds',cls:'cds',label:'🎪 Cirque du Soleil',sub:'Canada'}
+  ],{word:'Sentence',pts:12,accumulate:true,hint:()=>'Think about the text: which performance is it?'});
+}
+function L5(play){
+  binGame(play,TF,[
+    {key:'T',cls:'ok',label:'✅ True',sub:'the text says so'},
+    {key:'F',cls:'no',label:'❌ False',sub:'the text says something else'}
+  ],{word:'Sentence',pts:15,accumulate:false,hint:it=>it.k==='T'?'This sentence is true!':'Look for the wrong fact in the sentence.'});
+}
+
+/* ============ LEVEL 3: complete the facts ============ */
+function L3(play){
+  let left=GAPS.length;
+  play.innerHTML=`<div class="qgrid">${GAPS.map(g=>{
+      const p=g.s.split('___');
+      return `<div class="qcard"><div class="qs" style="--a:${g.c[0]};--b:${g.c[1]}"><span>${g.e}</span></div>
+        <div class="qt">${p[0]}<span class="zone gap" data-answer="${g.a}"></span>${p[1]}</div></div>`;
+    }).join('')}</div>
+    <div class="tray sticky">${shuffle(GAPS.map(g=>g.a).concat(GAP_DECOYS)).map(w=>`<div class="chip">${w}</div>`).join('')}</div>`;
+  dropHandler=(chip,zone)=>{
+    if(!zone.classList.contains('gap')||zone.firstElementChild) return;
+    if(chip.textContent===zone.dataset.answer){
+      zone.appendChild(chip);chip.classList.add('locked');
+      zone.closest('.qcard').classList.add('flash');
+      right(15);left--;
+      if(left===0) setTimeout(levelComplete,700);
+    }else wrong(chip,zone,chip.textContent==='1984'?'1984 is when the circus started. Which year is the theatre?':null);
+  };
+}
+
+/* ============ LEVEL 4: questions and answers ============ */
+function L4(play){
+  let left=QA.length;
+  play.innerHTML=QA.map((o,k)=>`
+      <div class="qa"><div class="q"><span class="em">${o.e}</span><span>${o.q}</span></div><div class="zone drop" data-id="${k}"></div></div>`).join('')+
+    `<div class="tray sticky">${shuffle(QA.map((o,k)=>({o,k}))).map(x=>`<div class="chip" data-id="${x.k}">${x.o.a}</div>`).join('')}</div>`;
+  dropHandler=(chip,zone)=>{
+    if(!zone.classList.contains('drop')||zone.firstElementChild) return;
+    if(chip.dataset.id===zone.dataset.id){
+      zone.appendChild(chip);chip.classList.add('locked');
+      zone.closest('.qa').classList.add('flash');
+      right(20);left--;
+      if(left===0) setTimeout(levelComplete,700);
+    }else wrong(chip,zone,'Read the question word: Why? When? What? How long?');
+  };
+}
+
+/* ============ START SCREEN ============ */
+function showStart(){
+  stopTimer();dropHandler=null;$('#hud').hidden=true;
+  $('#stage').innerHTML=`
+    <div class="hero">
+      <h1>Show Time!</h1>
+      <p class="sub">Performers around the world<br>Culture · Lesson 6, part 1</p>
+      <div class="duo">
+        <div class="pcard ah"><div class="em">⚔️🥁</div><b>Al Haboot</b><span>Oman</span></div>
+        <div class="pcard cds"><div class="em">🎪🤹</div><b>Cirque du Soleil</b><span>Canada</span></div>
+      </div>
+      <input id="pname" type="text" maxlength="30" placeholder="Write your name" aria-label="Your name" autocomplete="off">
+      <ul class="rules">
+        <li>🎭 5 levels – earn a stamp in each one</li>
+        <li>❤️ 5 lives. A mistake costs 1 life.</li>
+        <li>⏱️ Be fast to win a time bonus</li>
+        <li>👆 Drag the gold words, or tap and tap</li>
+      </ul>
+      <button class="btn" id="go">Start the show 🎬</button>
+      <div class="credit">Created by T.Badria Alfalahi</div>
+    </div>`;
+  $('#go').onclick=startGame;
+  $('#pname').addEventListener('keydown',e=>{if(e.key==='Enter') startGame()});
+}
+showStart();
+</script>
+</body>
+</html>
